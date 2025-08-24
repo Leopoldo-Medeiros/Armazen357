@@ -1,0 +1,42 @@
+name: armazem357
+recipe: laravel
+config:
+  php: '8.2'
+  via: nginx
+  webroot: backend/public
+  database: mysql:8.0
+  xdebug: true
+  cache: redis
+  composer_version: 2.5.8
+
+services:
+  node:
+    type: node:18
+    build: cd /app/frontend && npm install && npm run build
+  frontend:
+    type: node
+    service: node
+    scanner: false
+    ports:
+      - '3000:3000'
+    command: cd /app/frontend && npm run dev
+
+tooling:
+  npm:
+    service: node
+    cmd: npm
+  node:
+    service: node
+    cmd: node
+  yarn:
+    service: node
+    cmd: yarn
+  artisan:
+    service: appserver
+    cmd: php /app/backend/artisan
+  php:
+    service: appserver
+    cmd: php
+  composer:
+    service: appserver
+    cmd: composer
