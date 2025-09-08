@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // API Middleware
         $middleware->api([
             EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':60,1',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
     })
