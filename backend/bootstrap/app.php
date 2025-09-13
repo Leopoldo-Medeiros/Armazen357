@@ -19,6 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':60,1',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
+        
+        // Disable throttle middleware for now to debug the 500 error
+        $middleware->alias([
+            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+            'permission' => \App\Http\Middleware\CheckPermission::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
