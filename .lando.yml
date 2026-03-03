@@ -1,14 +1,14 @@
 name: armazen357
 recipe: laravel
 config:
-  php: '8.3'
+  php: '8.4'
   webroot: public
   via: nginx
   database: mysql:8.0
 
 services:
   appserver:
-    type: php:8.2
+    type: php:8.4
     ssl: true
     cert: /Users/leopoldomedeiros/.lando/certs/appserver.jobs2.crt
     key: /Users/leopoldomedeiros/.lando/certs/appserver.jobs2.key
