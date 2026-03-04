@@ -2,7 +2,7 @@ name: armazen357
 recipe: laravel
 config:
   php: '8.4'
-  webroot: public
+  webroot: backend/public
   via: nginx
   database: mysql:8.0
 
@@ -10,43 +10,67 @@ services:
   appserver:
     type: php:8.4
     ssl: true
-    cert: /Users/leopoldomedeiros/.lando/certs/appserver.jobs2.crt
-    key: /Users/leopoldomedeiros/.lando/certs/appserver.jobs2.key
+    overrides:
+      environment:
+        COMPOSER_MEMORY_LIMIT: -1
 
   node:
-    type: node:18
+    type: node:20
     ssl: false
     healthcheck: false
+    app_mount: false
+    overrides:
+      volumes:
+        - ./frontend:/app/frontend
+      working_dir: /app/frontend
 
 tooling:
-  install:
+  composer:
     service: appserver
-    cmd:
-      - composer install --no-cache
-      - php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - php artisan key:generate
-      - php artisan migrate --seed
-      - npm install
-      - php artisan storage:link
+    cmd: composer
+    dir: /app/backend
 
-  setup:
+  php:
     service: appserver
-    cmd:
-      - composer install --no-cache
-      - php -r "file_exists('.env') || copy('.env.example', '.env');"
-      - php artisan key:generate
-      - php artisan migrate --seed
-      - npm install
-      - php artisan storage:link
+    cmd: php
+    dir: /app/backend
 
-  tinker:
+  artisan:
     service: appserver
-    cmd: php artisan tinker
+    cmd: php artisan
+    dir: /app/backend
 
   migrate:
     service: appserver
     cmd: php artisan migrate
+    dir: /app/backend
 
   rollback:
     service: appserver
     cmd: php artisan migrate:rollback --step=1
+    dir: /app/backend
+
+  tinker:
+    service: appserver
+    cmd: php artisan tinker
+    dir: /app/backend
+
+  install:
+    service: appserver
+    cmd:
+      - composer install --no-cache --working-dir=/app/backend
+      - php -r "file_exists('/app/backend/.env') || copy('/app/backend/.env.example', '/app/backend/.env');"
+      - php /app/backend/artisan key:generate
+      - php /app/backend/artisan migrate --seed
+      - php /app/backend/artisan storage:link
+    dir: /app/backend
+
+  npm:
+    service: node
+    cmd: npm
+    dir: /app/frontend
+
+  nuxt:
+    service: node
+    cmd: npx nuxi
+    dir: /app/frontend
